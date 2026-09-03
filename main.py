@@ -4,7 +4,7 @@ from src.evaluation_metrics import find_best_hidden_feats
 def main():
     print("Load and process data...")
     X_train_aug, y_train_vec, X_val_aug, y_val_vec, pos_weight, feature_names = load_and_preprocess_data(
-        filepath="cs-training.csv"
+        "cs-training.csv"
     )
     
     print(f"Train shape: {X_train_aug.shape}, Val shape: {X_val_aug.shape}")
