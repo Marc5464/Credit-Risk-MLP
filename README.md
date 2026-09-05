@@ -58,4 +58,25 @@ To determine optimal network capacity, the model was evaluated across hidden lay
 To visualize how network capacity affects ranking quality across decision thresholds, Precision-Recall (PR) and Receiver Operating Characteristic (ROC) curves were generated for each hidden dimension $H \in \{8, 12, 16, 20, 32\}$.
 
 ![Precision-Recall Curve](pr-curve.png)
+
+#### Precision-Recall Curve Analysis
+
+* **Class Imbalance :** Since default rate is ~6.6%, the PR curve is evaluating the models ability to identify the positive cases only (where they defaulted) ignoring true negatives as a metric making the AUC a more sensitive measure of model efficacy. 
+* **Operating Point Selection:** Due to high cost of false negatives maximising recall is crucial, and if operating at a recall of 80% (ie correctly identifies 80% of defaulters you can expect a 20% precision (meaning only 20% of the models positives were correct). This more that triples the standalone default rate of ~6.6% while still finding the vast majority of positive cases..
+
 ![ROC-AUC Curve](roc-curve.png)
+
+#### ROC Curve Analysis
+
+* **High Global Separability:** An average ROC-AUC score of **~0.867** across all model sizes demonstrates the model has strong desicion making power.
+* **Invariance to Model Capacity:** The curves for $H \in \{8, 12, 16, 20, 32\}$ are almost identical. This indicates that the model's performance is more likely limited to lack of additional features and extrernal factors such as illness or losing a job that can cuase a defualt.
+
+## Conclusion & Production Recommendations
+
+The project successfully implemented a custom Credit Risk MLP built entirely in NumPy without external machine leanring librarys, demonstrating rigorous optimization and evaluation under realistic quantitative finance conditions.
+
+### My Primary Takeaways
+
+1. **Optimal Architecture Selection:** The $H = 12$ hidden unit architecture provided the best compromise between model simplicity and accuracy achieving (**PR-AUC = 0.4049**, **ROC-AUC = 0.8675**).
+2. **Optimizer Efficiency:** Implementing Momentum Gradient Descent ($\beta = 0.9$) smoothed out the learning route and speed up the convergence effectively over $10\times$ more than standard GD.
+3. **Evaluation Metrics:** Evaluating models via ROC-AUC with large outcome imbalances was shown to provide overly optimistic assessments due to the overwhelming volume of True Negatives. Combining Precision-Recall curve analysis with a heavier loss weighting on misclassifying default cases provides more accurate metrics for credit decisioning.
