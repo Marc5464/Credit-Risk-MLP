@@ -52,5 +52,9 @@ To determine optimal network capacity, the model was evaluated across hidden lay
 
 1. **Capacity** Increasing capacity from $H = 8$ to $H = 32$ multiplies the hidden layer parameters by 4 but ha no substantial gain in ROC-AUC (~0.8668 to ~0.8675) or loss reduction. This confirms that netwrok capacity is not a bottleneck and having less hidden features is simpler and achieves similar results.
 2. **Optimal Selection ($H = 12$ or $H = 20$):** $H = 12$ yields the highest Precision-Recall AUC (0.4049), making it the most practical choice because credit scoring requires high true positive identification rate since cost of false negative is high.
-3. **Training Uniformity:** All network sizes converge steadily within ~150–180 epochs, demonstrating that initialization scale (He Initialization) scaled correctly across varying feature matrix dimensions.
+
+### Visuals produced across hidden architectures
+
+To visualize how network capacity affects ranking quality across decision thresholds, Precision-Recall (PR) and Receiver Operating Characteristic (ROC) curves were generated for each hidden dimension $H \in \{8, 12, 16, 20, 32\}$.
+
 
