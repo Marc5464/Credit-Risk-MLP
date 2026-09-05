@@ -38,16 +38,16 @@ def calculate_pr_roc_data(Yhat, Y, num_thresholds=100):
     
     return pr_recalls_sorted, pr_precisions_sorted, roc_fpr_sorted, roc_tpr_sorted
 
-def train_and_eval_single(X_tr, y_tr, X_va, y_va, pos_w, H=16):
+def train_and_eval_single(X_tr, y_tr, X_va, y_va, pos_w, H=16, batch = 512, learn_rate = 0.01):
     input_dim = X_tr.shape[1]
     
     W1 = np.random.randn(input_dim, H) * np.sqrt(2.0 / input_dim)
     W2 = np.random.randn(H + 1, 1) * np.sqrt(2.0 / (H + 1))
     
-    momentum = MomentumGD(0.01, 0.9)
+    momentum = MomentumGD(learn_rate, 0.9)
     bestW1, bestW2, _, _ = train_network(
         X_tr, y_tr, X_va, y_va, W1, W2, momentum, pos_w, 
-        epochs=1000, batch=512, use_early_stopping=True
+        epochs=1000, batch=batch, use_early_stopping=True
     )
     
     _, _, Yhat_val = forward_pass(X_va, bestW1, bestW2)
@@ -114,6 +114,45 @@ def find_best_hidden_feats(X_train, y_train, X_val, y_val, pos_weight=1, hidden_
     plt.legend()
     plt.grid(True, linestyle=':', alpha=0.6)
     plt.show()
+
+
+def run_grid_search(X_tr, y_tr, X_va, y_va, pos_w, H=16):
+    learning_rates = [0.001, 0.01, 0.1]
+    batch_sizes = [128, 256, 512]
+
+    results = []
+
+    print("Starting Grid Search (Learning Rate x Batch Size)...\n")
+    print(
+        f"{'LR':<8} | {'Batch Size':<10} | {'Val Loss':<10} | {'PR-AUC':<10} | {'ROC-AUC':<10}"
+    )
+    print("-" * 58)
+
+    for lr in learning_rates:
+        for batch in batch_sizes:
+            val_loss, pr_auc, roc_auc, _, _ = train_and_eval_single(
+                X_tr, y_tr, X_va, y_va, pos_w, H, batch, lr
+            )
+
+            results.append({
+                "lr": lr,
+                "batch_size": batch,
+                "val_loss": val_loss,
+                "pr_auc": pr_auc,
+                "roc_auc": roc_auc,
+            })
+
+            print(
+                f"{lr:<8} | {batch:<10} | {val_loss:<10.4f} | {pr_auc:<10.4f} | {roc_auc:<10.4f}"
+            )
+
+    best_config = max(results, key=lambda x: x["roc_auc"])
+    print("-" * 58)
+    print(
+        f"Best Config -> LR: {best_config['lr']}, Batch Size: {best_config['batch_size']} (ROC-AUC: {best_config['roc_auc']:.4f})"
+    )
+
+    return results, best_config
 
 def run_lofo_feature_pruning(X_train_aug, y_train_vec, X_val_aug, y_val_vec, pos_weight, feature_names, H=16):
     print(f"=== Starting Leave-One-Out Feature Selection (H={H}) ===")
