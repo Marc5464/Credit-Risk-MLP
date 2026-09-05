@@ -57,4 +57,5 @@ To determine optimal network capacity, the model was evaluated across hidden lay
 
 To visualize how network capacity affects ranking quality across decision thresholds, Precision-Recall (PR) and Receiver Operating Characteristic (ROC) curves were generated for each hidden dimension $H \in \{8, 12, 16, 20, 32\}$.
 
-
+![Precision-Recall Curve](pr-curve.png)
+![ROC-AUC Curve](roc-curve.png)
